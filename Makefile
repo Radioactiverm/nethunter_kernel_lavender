@@ -620,7 +620,9 @@ ifneq ($(GCC_TOOLCHAIN),)
 CLANG_FLAGS	+= --gcc-toolchain=$(GCC_TOOLCHAIN)
 endif
 CLANG_FLAGS	+= -no-integrated-as
-CLANG_FLAGS	+= -Werror=unknown-warning-option
+# Built with clang-10 (Mimir shipped with clang-14): tolerate newer -W flags
+# this tree passes (e.g. -Wno-enum-enum-conversion) instead of erroring on them.
+CLANG_FLAGS	+= -Wno-unknown-warning-option
 CLANG_FLAGS    += $(call cc-option, -Wno-misleading-indentation)
 CLANG_FLAGS    += $(call cc-option, -Wno-bool-operation)
 KBUILD_CFLAGS	+= $(CLANG_FLAGS)

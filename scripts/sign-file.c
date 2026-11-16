@@ -209,6 +209,7 @@ int main(int argc, char **argv)
 	 * will point to.
 	 */
 	if (!strncmp(private_key_name, "pkcs11:", 7)) {
+#if OPENSSL_VERSION_NUMBER < 0x30000000L
 		ENGINE *e;
 
 		ENGINE_load_builtin_engines();
@@ -224,6 +225,11 @@ int main(int argc, char **argv)
 		private_key = ENGINE_load_private_key(e, private_key_name, NULL,
 						      NULL);
 		ERR(!private_key, "%s", private_key_name);
+#else
+		/* OpenSSL 3.0+/4.x removed the ENGINE API; PKCS#11 keys are
+		 * unused for this kernel build (a PEM key file is used). */
+		ERR(1, "PKCS#11 keys unsupported (built against OpenSSL 3.0+)");
+#endif
 	} else {
 		b = BIO_new_file(private_key_name, "rb");
 		ERR(!b, "%s", private_key_name);
